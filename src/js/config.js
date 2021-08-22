@@ -5,7 +5,7 @@
 
 
 //TODO: API URL
-export const API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes";
+export const API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes/";
 
 //TODO: PROMISE REJECTION TIMEOUT
 export const TIMEOUT_SEC = 10;

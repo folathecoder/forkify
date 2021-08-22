@@ -5,15 +5,19 @@ import { getJSON } from './helpers';
 
 //State
 export const state = {
-    recipe: {}
+    recipe: {},
+    search: {
+      query: '',
+      results: []
+    }
 }
 
-//Fetch recipe data from the forkify API
+//TODO: Fetch recipe data from the forkify API
 export const loadRecipe = async function(id) {
 
   try {
 
-    const data = await getJSON(`${API_URL}/${id}`)
+    const data = await getJSON(`${API_URL}${id}`)
 
     //Customize the properties in the recipe object
     const {recipe} = data.data;
@@ -36,4 +40,26 @@ export const loadRecipe = async function(id) {
   }
 }
 
-console.log(state);
+//TODO: Fetch searched recipe data from the forkify api
+
+export const loadSearchResults = async function(query) {
+  try {
+    //Push Query to State
+    state.search.query = query;
+
+    const data = await getJSON(`${API_URL}?search=${query}`);
+
+    state.search.results = data.data.recipes.map(rec => {
+      return {
+        id: rec.id,
+        title: rec.title,
+        publisher: rec.publisher,
+        sourceUrl: rec.source_url,
+        image: rec.image_url
+      }
+    })
+
+  } catch (error) {
+    throw error;
+  }
+}

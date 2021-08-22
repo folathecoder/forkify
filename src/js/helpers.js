@@ -23,7 +23,8 @@ export const getJSON = async function (url) {
         if (!res.ok) throw new Error(`${recipe.status} 🤦‍♂️ Recipe data could not be fetched from the server. Please try again later!`)
 
         return data;
+
     } catch (error) {
-        alert(error);
+        throw error;
     }
 }
