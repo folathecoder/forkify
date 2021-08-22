@@ -13032,15 +13032,21 @@ try {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TIMEOUT_SEC = exports.API_URL = void 0;
+exports.DEFAULT_PAGE = exports.RESULTS_PER_PAGE = exports.TIMEOUT_SEC = exports.API_URL = void 0;
 //Variables that should be constant and re-used across the project 
 //This will allow us to easily change the data without diggin through all the project file
 //TODO: API URL
 var API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes/"; //TODO: PROMISE REJECTION TIMEOUT
 
 exports.API_URL = API_URL;
-var TIMEOUT_SEC = 10;
+var TIMEOUT_SEC = 10; //TODO: RESULTS PER PAGE (PAGINATION)
+
 exports.TIMEOUT_SEC = TIMEOUT_SEC;
+var RESULTS_PER_PAGE = 10; //TODO: DEFAULT PAGE NUMBER 
+
+exports.RESULTS_PER_PAGE = RESULTS_PER_PAGE;
+var DEFAULT_PAGE = 1;
+exports.DEFAULT_PAGE = DEFAULT_PAGE;
 },{}],"src/js/helpers.js":[function(require,module,exports) {
 "use strict";
 
@@ -13119,7 +13125,7 @@ exports.getJSON = getJSON;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.loadSearchResults = exports.loadRecipe = exports.state = void 0;
+exports.getSearchResultPage = exports.loadSearchResults = exports.loadRecipe = exports.state = void 0;
 
 var _regeneratorRuntime = require("regenerator-runtime");
 
@@ -13136,7 +13142,9 @@ var state = {
   recipe: {},
   search: {
     query: '',
-    results: []
+    results: [],
+    resultsPerPage: _config.RESULTS_PER_PAGE,
+    page: _config.DEFAULT_PAGE
   }
 }; //TODO: Fetch recipe data from the forkify API
 
@@ -13236,9 +13244,20 @@ var loadSearchResults = /*#__PURE__*/function () {
   return function loadSearchResults(_x2) {
     return _ref2.apply(this, arguments);
   };
-}();
+}(); //TODO: Pagination 
+
 
 exports.loadSearchResults = loadSearchResults;
+
+var getSearchResultPage = function getSearchResultPage() {
+  var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : state.search.page;
+  state.search.page = page;
+  var start = (page - 1) * state.search.resultsPerPage;
+  var end = page * state.search.resultsPerPage;
+  return state.search.results.slice(start, end);
+};
+
+exports.getSearchResultPage = getSearchResultPage;
 },{"regenerator-runtime":"node_modules/regenerator-runtime/runtime.js","./config":"src/js/config.js","./helpers":"src/js/helpers.js"}],"src/img/icons.svg":[function(require,module,exports) {
 module.exports = "/icons.ae3c38d5.svg";
 },{}],"src/js/views/View.js":[function(require,module,exports) {
@@ -13547,7 +13566,7 @@ var ResultView = /*#__PURE__*/function (_View) {
   _createClass(ResultView, [{
     key: "_generateMarkup",
     value: function _generateMarkup() {
-      return this._data.map(this._generateMarkupPreview).join('');
+      return this._data.map(this._generateMarkupPreview).slice('1').join('');
     }
   }, {
     key: "_generateMarkupPreview",
@@ -13562,7 +13581,98 @@ var ResultView = /*#__PURE__*/function (_View) {
 var _default = new ResultView();
 
 exports.default = _default;
-},{"./View.js":"src/js/views/View.js"}],"src/js/controller.js":[function(require,module,exports) {
+},{"./View.js":"src/js/views/View.js"}],"src/js/views/paginationView.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _View2 = _interopRequireDefault(require("./View.js"));
+
+var _icons = _interopRequireDefault(require("../../img/icons.svg"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var PaginationView = /*#__PURE__*/function (_View) {
+  _inherits(PaginationView, _View);
+
+  var _super = _createSuper(PaginationView);
+
+  function PaginationView() {
+    var _this;
+
+    _classCallCheck(this, PaginationView);
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _super.call.apply(_super, [this].concat(args));
+
+    _defineProperty(_assertThisInitialized(_this), "_parentElement", document.querySelector('.pagination'));
+
+    return _this;
+  }
+
+  _createClass(PaginationView, [{
+    key: "_generateMarkup",
+    value: function _generateMarkup() {
+      var curPage = this._data.page;
+      var numPages = Math.ceil((this._data.results.length + 1) / this._data.resultsPerPage);
+      console.log(numPages); //Page 1, there are other pages
+
+      if (curPage === 1 && numPages > 1) {
+        return "\n            <button class=\"btn--inline pagination__btn--next\">\n                <span>Page ".concat(curPage + 1, "</span>\n                <svg class=\"search__icon\">\n                <use href=\"").concat(_icons.default, "#icon-arrow-right\"></use>\n                </svg>\n            </button>\n            ");
+      } //Last page
+
+
+      if (curPage === numPages && numPages > 1) {
+        return "\n            <button class=\"btn--inline pagination__btn--prev\">\n                <svg class=\"search__icon\">\n                <use href=\"".concat(_icons.default, "#icon-arrow-left\"></use>\n                </svg>\n                <span>Page ").concat(curPage - 1, "</span>\n            </button>\n            ");
+      } //Other pages
+
+
+      if (curPage < numPages) {
+        return "\n            <button class=\"btn--inline pagination__btn--prev\">\n                <svg class=\"search__icon\">\n                <use href=\"".concat(_icons.default, "#icon-arrow-left\"></use>\n                </svg>\n                <span>Page ").concat(curPage - 1, "</span>\n            </button>\n            <button class=\"btn--inline pagination__btn--next\">\n                <spanPage ").concat(curPage + 1, "</span>\n                <svg class=\"search__icon\">\n                <use href=\"").concat(_icons.default, "#icon-arrow-right\"></use>\n                </svg>\n            </button>\n            ");
+      } //Page 1, there are no other pages
+
+
+      return 'only 1 page';
+    }
+  }]);
+
+  return PaginationView;
+}(_View2.default);
+
+var _default = new PaginationView();
+
+exports.default = _default;
+},{"./View.js":"src/js/views/View.js","../../img/icons.svg":"src/img/icons.svg"}],"src/js/controller.js":[function(require,module,exports) {
 "use strict";
 
 var model = _interopRequireWildcard(require("./model.js"));
@@ -13572,6 +13682,8 @@ var _recipeView = _interopRequireDefault(require("./views/recipeView.js"));
 var _searchView = _interopRequireDefault(require("./views/searchView.js"));
 
 var _resultsView = _interopRequireDefault(require("./views/resultsView.js"));
+
+var _paginationView = _interopRequireDefault(require("./views/paginationView.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13586,11 +13698,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
 //TODO: Activate Hot Module
-if (module.hot) {
-  module.hot.accept();
-} //TODO: Fetch Individual Recipe From Endpoint
-
-
+// if(module.hot) {
+//   module.hot.accept();
+// }
+//TODO: Fetch Individual Recipe From Endpoint
 var controlRecipes = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
     var id;
@@ -13671,24 +13782,24 @@ var controlSearchResults = /*#__PURE__*/function () {
             return model.loadSearchResults(query);
 
           case 7:
-            _resultsView.default.render(model.state.search.results);
+            _resultsView.default.render(model.getSearchResultPage(3));
 
-            console.log(model.state.search.results);
-            console.log(query);
-            _context2.next = 15;
+            _paginationView.default.render(model.state.search);
+
+            _context2.next = 14;
             break;
 
-          case 12:
-            _context2.prev = 12;
+          case 11:
+            _context2.prev = 11;
             _context2.t0 = _context2["catch"](0);
             console.log(_context2.t0);
 
-          case 15:
+          case 14:
           case "end":
             return _context2.stop();
         }
       }
-    }, _callee2, null, [[0, 12]]);
+    }, _callee2, null, [[0, 11]]);
   }));
 
   return function controlSearchResults() {
@@ -13704,7 +13815,7 @@ var init = function init() {
 };
 
 init();
-},{"./model.js":"src/js/model.js","./views/recipeView.js":"src/js/views/recipeView.js","./views/searchView.js":"src/js/views/searchView.js","./views/resultsView.js":"src/js/views/resultsView.js"}],"src/js/index.js":[function(require,module,exports) {
+},{"./model.js":"src/js/model.js","./views/recipeView.js":"src/js/views/recipeView.js","./views/searchView.js":"src/js/views/searchView.js","./views/resultsView.js":"src/js/views/resultsView.js","./views/paginationView.js":"src/js/views/paginationView.js"}],"src/js/index.js":[function(require,module,exports) {
 "use strict";
 
 require("core-js/stable");
@@ -13746,7 +13857,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60713" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65087" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

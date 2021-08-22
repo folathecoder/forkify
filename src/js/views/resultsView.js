@@ -7,7 +7,7 @@ class ResultView extends View {
 
 
     _generateMarkup() {
-        return this._data.map(this._generateMarkupPreview).join('');
+        return this._data.map(this._generateMarkupPreview).slice('1').join('');
     }
 
     _generateMarkupPreview(result) {
